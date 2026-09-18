@@ -1,3 +1,4 @@
+package generators;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
@@ -29,10 +30,6 @@ public class RouteGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(RouteGenerator.class);
 
-    public static void main(String[] args) throws Exception {
-        generateRoutes();
-
-    }
 
     public static List<String> getSuppliers() throws Exception {
         log.warn("Consuming suppliers from DBInfo topic");
@@ -143,7 +140,7 @@ public class RouteGenerator {
         List<String> destinations = Arrays.asList("Porto", "Lisbon", "Braga", "Faro");
         int routeCounter = 1;
         Random rand = new Random();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             String operator = suppliers.get(rand.nextInt(suppliers.size()));
             int capacity = Integer.parseInt(capacities.get(rand.nextInt(capacities.size())));
 
@@ -159,6 +156,7 @@ public class RouteGenerator {
         }
         producer.flush();
         producer.close();
+        log.info("All routes sent");
     }
 
     
