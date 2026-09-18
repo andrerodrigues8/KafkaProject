@@ -8,7 +8,7 @@ services:
       - 5432:5432
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: My01pass
+      POSTGRES_PASSWORD: pass
       POSTGRES_DB: project3
     volumes:
       - ../sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
@@ -72,7 +72,7 @@ services:
       KAFKA_NUM_PARTITIONS: 3
 
   connect:
-    image: confluentinc/cp-kafka-connect
+    image: confluentinc/cp-kafka-connect:7.5.1
     depends_on:
       - broker1
     ports:
@@ -83,16 +83,16 @@ services:
       - broker3
       - database
     environment:
-      - CONNECT_BOOTSTRAP_SERVERS=broker1:9092,broker2:9093,broker3:9094
+      - CONNECT_BOOTSTRAP_SERVERS=broker1:9092,broker2:9092,broker3:9092
       - CONNECT_REST_ADVERTISED_PORT=8083
       - CONNECT_REST_ADVERTISED_HOST_NAME=connect
       - CONNECT_GROUP_ID=connect
       - CONNECT_CONFIG_STORAGE_TOPIC=_connect_configs
-      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR=3
       - CONNECT_OFFSET_STORAGE_TOPIC=_connect_offsets
-      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR=3
       - CONNECT_STATUS_STORAGE_TOPIC=_connect_status
-      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=1
+      - CONNECT_STATUS_STORAGE_REPLICATION_FACTOR=3
       - CONNECT_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - CONNECT_INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
