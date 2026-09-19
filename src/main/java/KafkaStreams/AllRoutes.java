@@ -17,22 +17,20 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import Objects.Route;
 import Objects.Trip;
 import serdes.wrapper.RouteSerdes;
 import serdes.wrapper.TripSerdes;
 
-public class PerRoute {
+public class AllRoutes {
+    private static final Logger log = LoggerFactory.getLogger(AllRoutes.class);
 
-    private static final Logger log = LoggerFactory.getLogger(PerRoute.class);
-
-    // Req 4
-    public static void getPassengerPerRoute() {
-        log.info("Streams for Requirement 4 started.");
+    // Req 7
+    public static void getTotalPassengers() {
+        log.info("Streams for Requirement 7 started.");
         String bootstrapServers = "broker1:9092";
-        String applicationId = "passengers-per-route";
+        String applicationId = "total-passengers";
         String inputTopic = "trips";
-        String outputTopic = "results-req4";
+        String outputTopic = "results-req7";
         Properties props = new Properties();
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
@@ -44,7 +42,7 @@ public class PerRoute {
         StreamsBuilder builder = new StreamsBuilder();
 
         KStream<String, Trip> trips = builder.stream(inputTopic);
-        trips.groupBy((key, value) -> value.getRouteId(),
+        trips.groupBy((key, value) -> "Total",
                 Grouped.with(Serdes.String(), new TripSerdes()))
                 .count()
                 .toStream()
@@ -59,14 +57,14 @@ public class PerRoute {
         streams.start();
     }
 
-    // Req 5
-    public static void getAvailableSeats() {
-        log.info("Streams for Requirement 5 started.");
+    // Req 8
+    public static void getTotalAvailableSeats() {
+        log.info("Streams for Requirement 8 started.");
         String bootstrapServers = "broker1:9092";
-        String applicationId = "available-seats";
+        String applicationId = "total-available-seats";
         String tripsTopic = "trips";
         String routesTopic = "routes";
-        String outputTopic = "results-req5";
+        String outputTopic = "results-req8";
         Properties props = new Properties();
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
@@ -77,33 +75,43 @@ public class PerRoute {
 
         StreamsBuilder builder = new StreamsBuilder();
 
-        KTable<String, Route> routes = builder
+        KTable<String, Long> totalCapacity = builder
                 .stream(
                         routesTopic,
                         Consumed.with(Serdes.String(), new RouteSerdes()))
-                .selectKey((key, route) -> route.getRouteId())
-                .toTable(
+                .groupBy(
+                        (key, route) -> "Total",
+                        Grouped.with(
+                                Serdes.String(),
+                                new RouteSerdes()))
+                .aggregate(
+                        () -> 0L,
+                        (key, route, total) -> total + route.getCapacity(),
                         Materialized.with(
                                 Serdes.String(),
-                                new RouteSerdes()));
-        builder
+                                Serdes.Long()));
+
+        KTable<String, Long> totalPassengers = builder
                 .stream(
                         tripsTopic,
                         Consumed.with(Serdes.String(), new TripSerdes()))
                 .groupBy(
-                        (key, trip) -> trip.getRouteId(),
+                        (key, trip) -> "Total",
                         Grouped.with(
                                 Serdes.String(),
                                 new TripSerdes()))
-                .count()
+                .count();
+
+        totalPassengers
                 .join(
-                        routes,
-                        (passengers, route) -> (long) route.getCapacity() - passengers)
+                        totalCapacity,
+                        (passengers, capacity) -> capacity - passengers)
                 .toStream()
                 .to(
                         outputTopic,
-                        Produced.with(Serdes.String(), Serdes.Long()));
-
+                        Produced.with(
+                                Serdes.String(),
+                                Serdes.Long()));
         Topology topology = builder.build();
 
         KafkaStreams streams = new KafkaStreams(topology, props);
@@ -112,14 +120,14 @@ public class PerRoute {
         streams.cleanUp();
         streams.start();
     }
-    // Req 6
-    public static void getOccupancy() {
-        log.info("Streams for Requirement 6 started.");
+    // Req 9
+    public static void getTotalOccupancy() {
+        log.info("Streams for Requirement 9 started.");
         String bootstrapServers = "broker1:9092";
-        String applicationId = "occupancy";
+        String applicationId = "total-occupancy";
         String tripsTopic = "trips";
         String routesTopic = "routes";
-        String outputTopic = "results-req6";
+        String outputTopic = "results-req9";
         Properties props = new Properties();
 
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, applicationId);
@@ -130,33 +138,43 @@ public class PerRoute {
 
         StreamsBuilder builder = new StreamsBuilder();
 
-        KTable<String, Route> routes = builder
+        KTable<String, Long> totalCapacity = builder
                 .stream(
                         routesTopic,
                         Consumed.with(Serdes.String(), new RouteSerdes()))
-                .selectKey((key, route) -> route.getRouteId())
-                .toTable(
+                .groupBy(
+                        (key, route) -> "Total",
+                        Grouped.with(
+                                Serdes.String(),
+                                new RouteSerdes()))
+                .aggregate(
+                        () -> 0L,
+                        (key, route, total) -> total + route.getCapacity(),
                         Materialized.with(
                                 Serdes.String(),
-                                new RouteSerdes()));
-        builder
+                                Serdes.Long()));
+
+        KTable<String, Long> totalPassengers = builder
                 .stream(
                         tripsTopic,
                         Consumed.with(Serdes.String(), new TripSerdes()))
                 .groupBy(
-                        (key, trip) -> trip.getRouteId(),
+                        (key, trip) -> "Total",
                         Grouped.with(
                                 Serdes.String(),
                                 new TripSerdes()))
-                .count()
+                .count();
+
+        totalPassengers
                 .join(
-                        routes,
-                        (passengers, route) -> (double) Math.round((double) passengers / route.getCapacity() * 100 * 100.0) / 100.0)
+                        totalCapacity,
+                        (passengers, capacity) -> (double) Math.round((double) passengers / capacity * 100 * 100.0) / 100.0)
                 .toStream()
                 .to(
                         outputTopic,
-                        Produced.with(Serdes.String(), Serdes.Double()));
-
+                        Produced.with(
+                                Serdes.String(),
+                                Serdes.Double()));
         Topology topology = builder.build();
 
         KafkaStreams streams = new KafkaStreams(topology, props);
@@ -165,4 +183,5 @@ public class PerRoute {
         streams.cleanUp();
         streams.start();
     }
+
 }

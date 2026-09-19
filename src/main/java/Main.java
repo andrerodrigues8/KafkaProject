@@ -16,13 +16,17 @@ public class Main {
         deleteTopic("results-req4");
         deleteTopic("results-req5");
         deleteTopic("results-req6");
-        
+        deleteTopic("results-req7");
+        deleteTopic("results-req8");
+        deleteTopic("results-req9");
+        deleteTopic("results-req10");
+
         RouteGenerator.generateRoutes();
         Thread.sleep(1000);
         TripGenerator.generateTrips();
         Thread.sleep(1000);
-        PerRoute.getOccupancy();
-        
+        PerTransport.getAveragePerTransport();
+
     }
 
     public static void deleteTopic(String topic) {
