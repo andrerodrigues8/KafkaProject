@@ -20,12 +20,17 @@ public class Main {
         deleteTopic("results-req8");
         deleteTopic("results-req9");
         deleteTopic("results-req10");
-
+        deleteTopic("results-req11");
+        deleteTopic("results-req12");
+        deleteTopic("results-req13");
+        deleteTopic("results-req14");
+        deleteTopic("results-req15");
+        deleteTopic("results-req16");
         RouteGenerator.generateRoutes();
         Thread.sleep(1000);
         TripGenerator.generateTrips();
         Thread.sleep(1000);
-        PerTransport.getAveragePerTransport();
+        NameStats.getPassengerWithMostTrips();
 
     }
 

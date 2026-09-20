@@ -140,7 +140,7 @@ public class RouteGenerator {
         List<String> destinations = Arrays.asList("Porto", "Lisbon", "Braga", "Faro");
         int routeCounter = 1;
         Random rand = new Random();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             String operator = suppliers.get(rand.nextInt(suppliers.size()));
             int capacity = Integer.parseInt(capacities.get(rand.nextInt(capacities.size())));
 
