@@ -1,0 +1,24 @@
+{
+  "name": "jdbc-results",
+  "config": {
+    "connection.url": "jdbc:postgresql://database:5432/project3?user=postgres&password=pass",
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "dialect.name": "PostgreSqlDatabaseDialect",
+    "tasks.max": "3",
+    "topics.regex": "results-req([4-9]|1[0-6])",
+    "table.name.format": "${topic}",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "transforms": "HoistValue,RenameTopic",
+    "transforms.HoistValue.type": "org.apache.kafka.connect.transforms.HoistField$Value",
+    "transforms.HoistValue.field": "value",
+    "transforms.RenameTopic.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.RenameTopic.regex": "results-req(.*)",
+    "transforms.RenameTopic.replacement": "results_req$1",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "insert.mode": "upsert",
+    "pk.mode": "record_key",
+    "pk.fields": "id"
+  }
+}

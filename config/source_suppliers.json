@@ -1,0 +1,17 @@
+{
+    "name": "jdbc-source-suppliers",
+    "config": {
+        "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+        "connection.url": "jdbc:postgresql://database:5432/project3",
+        "connection.user": "postgres",
+        "connection.password": "pass",
+
+        "dialect.name": "PostgreSqlDatabaseDialect",
+
+        "mode": "bulk",
+        "query": "SELECT id, name FROM route_suppliers;",
+        "poll.interval.ms": "60000",
+
+        "topic.prefix": "dbinfo-route_suppliers"
+    }
+}
