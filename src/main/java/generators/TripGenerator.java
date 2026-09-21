@@ -83,10 +83,10 @@ public class TripGenerator {
         List<Route> routes = getRoutes();
         int tripCounter = 1;
         Random rand = new Random();
-        for (int i = 0; i < 20000; i++) {
+        for (int i = 0; i < 10000; i++) {
             Route route = routes.get(rand.nextInt(routes.size()));
             String tripId = "trip-" + tripCounter++;
-            String passengerId="passenger-"+(rand.nextInt(20000)+1);
+            String passengerId="passenger-"+(rand.nextInt(10000)+1);
             Trip trip=new Trip(tripId,route.getRouteId(),route.getOrigin(),route.getDestination(),route.getTransportType(),passengerId);
             ProducerRecord<String, Trip> record = new ProducerRecord<>(topic, tripId, trip);
 

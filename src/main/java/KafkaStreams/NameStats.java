@@ -121,7 +121,7 @@ public class NameStats {
         KafkaStreams streams = new KafkaStreams(topology, props);
 
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-        streams.cleanUp();
+        
         streams.start();
     }
 
@@ -280,7 +280,7 @@ public class NameStats {
         KafkaStreams streams = new KafkaStreams(topology, props);
 
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
-        streams.cleanUp();
+        
         streams.start();
     }
 
